@@ -1,98 +1,96 @@
-import * as Device from 'expo-device';
-import { Platform, StyleSheet } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { Image } from 'expo-image';
+import { LinearGradient } from 'expo-linear-gradient';
+import { router } from 'expo-router';
+import { Pressable, Text, useWindowDimensions, View } from 'react-native';
+import Animated, { FadeIn, FadeInDown } from 'react-native-reanimated';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import { AnimatedIcon } from '@/components/animated-icon';
-import { HintRow } from '@/components/hint-row';
-import { ThemedText } from '@/components/themed-text';
-import { ThemedView } from '@/components/themed-view';
-import { WebBadge } from '@/components/web-badge';
-import { BottomTabInset, MaxContentWidth, Spacing } from '@/constants/theme';
+import { ContinueRing } from '@/components/continue-ring';
+import { DotGridButton } from '@/components/icon-buttons';
+import { RidgeBackdrop } from '@/components/ridge-backdrop';
 
-function getDevMenuHint() {
-  if (Platform.OS === 'web') {
-    return <ThemedText type="small">use browser devtools</ThemedText>;
-  }
-  if (Device.isDevice) {
-    return (
-      <ThemedText type="small">
-        shake device or press <ThemedText type="code">m</ThemedText> in terminal
-      </ThemedText>
-    );
-  }
-  const shortcut = Platform.OS === 'android' ? 'cmd+m (or ctrl+m)' : 'cmd+d';
+type HeadlineLineProps = {
+  children: string;
+  delay: number;
+  color: 'text-pulse' | 'text-bone';
+  width: number;
+  align: 'flex-start' | 'flex-end';
+  indent: number;
+};
+
+// Michroma uppercase advance is ~1.09em per character, so a line's font
+// size can be derived from the horizontal space it should fill.
+const MICHROMA_ADVANCE = 1.09;
+
+function HeadlineLine({ children, delay, color, width, align, indent }: HeadlineLineProps) {
+  const { width: screenWidth } = useWindowDimensions();
+  const fontSize = (screenWidth * width - indent) / (children.length * MICHROMA_ADVANCE);
+
   return (
-    <ThemedText type="small">
-      press <ThemedText type="code">{shortcut}</ThemedText>
-    </ThemedText>
+    <Animated.View
+      entering={FadeInDown.delay(delay).duration(600)}
+      style={{ width: `${width * 100}%`, alignSelf: align, paddingLeft: indent, marginTop: -6 }}>
+      <Text
+        numberOfLines={1}
+        className={`font-display ${color}`}
+        style={{ fontSize, lineHeight: fontSize * 1.12 }}>
+        {children}
+      </Text>
+    </Animated.View>
   );
 }
 
-export default function HomeScreen() {
+export default function Onboarding() {
+  const insets = useSafeAreaInsets();
+  const openCollection = () => router.push('/collection');
+
   return (
-    <ThemedView style={styles.container}>
-      <SafeAreaView style={styles.safeArea}>
-        <ThemedView style={styles.heroSection}>
-          <AnimatedIcon />
-          <ThemedText type="title" style={styles.title}>
-            Welcome to&nbsp;Expo
-          </ThemedText>
-        </ThemedView>
+    <View
+      className="flex-1 bg-ink"
+      style={{ paddingTop: insets.top + 12, paddingBottom: insets.bottom + 12 }}>
+      <RidgeBackdrop />
 
-        <ThemedText type="code" style={styles.code}>
-          get started
-        </ThemedText>
+      {/* Wordmark + menu */}
+      <View className="flex-row items-center justify-between px-6">
+        <Text className="font-display text-sm tracking-[6px] text-bone">CARSPROJ.</Text>
+        <DotGridButton onPress={openCollection} />
+      </View>
 
-        <ThemedView type="backgroundElement" style={styles.stepContainer}>
-          <HintRow
-            title="Try editing"
-            hint={<ThemedText type="code">src/app/index.tsx</ThemedText>}
-          />
-          <HintRow title="Dev tools" hint={getDevMenuHint()} />
-          <HintRow
-            title="Fresh start"
-            hint={<ThemedText type="code">npm run reset-project</ThemedText>}
-          />
-        </ThemedView>
+      {/* Hero — Ferrari 512S Modulo, side profile on a dark reflective floor */}
+      <Animated.View entering={FadeIn.duration(900)} style={{ marginTop: 24, height: '26%' }}>
+        <Image
+          source={require('@/assets/images/cars/modulo-side.png')}
+          contentFit="contain"
+          transition={300}
+          style={{ width: '100%', height: '100%' }}
+        />
+        <LinearGradient
+          colors={['#0B0E14', 'rgba(11,14,20,0)', 'rgba(11,14,20,0)', '#0B0E14']}
+          locations={[0, 0.2, 0.8, 1]}
+          style={{ position: 'absolute', top: 0, bottom: 0, left: 0, right: 0 }}
+        />
+      </Animated.View>
 
-        {Platform.OS === 'web' && <WebBadge />}
-      </SafeAreaView>
-    </ThemedView>
+      {/* Headline */}
+      <View className="mt-5 flex-1 justify-center">
+        <HeadlineLine delay={100} color="text-pulse" width={0.7} align="flex-start" indent={20}>
+          RACE
+        </HeadlineLine>
+        <HeadlineLine delay={250} color="text-bone" width={0.72} align="flex-end" indent={0}>
+          CARS
+        </HeadlineLine>
+        <HeadlineLine delay={400} color="text-bone" width={0.86} align="flex-start" indent={32}>
+          PRJCT
+        </HeadlineLine>
+      </View>
+
+      {/* Skip / Continue */}
+      <View className="flex-row items-center justify-between pl-6 pr-4">
+        <Pressable onPress={openCollection} hitSlop={16} className="active:opacity-70">
+          <Text className="font-grotesk text-base text-smoke">Skip</Text>
+        </Pressable>
+        <ContinueRing onPress={openCollection} />
+      </View>
+    </View>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: 'center',
-    flexDirection: 'row',
-  },
-  safeArea: {
-    flex: 1,
-    paddingHorizontal: Spacing.four,
-    alignItems: 'center',
-    gap: Spacing.three,
-    paddingBottom: BottomTabInset + Spacing.three,
-    maxWidth: MaxContentWidth,
-  },
-  heroSection: {
-    alignItems: 'center',
-    justifyContent: 'center',
-    flex: 1,
-    paddingHorizontal: Spacing.four,
-    gap: Spacing.four,
-  },
-  title: {
-    textAlign: 'center',
-  },
-  code: {
-    textTransform: 'uppercase',
-  },
-  stepContainer: {
-    gap: Spacing.three,
-    alignSelf: 'stretch',
-    paddingHorizontal: Spacing.three,
-    paddingVertical: Spacing.four,
-    borderRadius: Spacing.four,
-  },
-});
