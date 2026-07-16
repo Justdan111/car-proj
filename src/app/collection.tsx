@@ -1,4 +1,3 @@
-import { Image } from 'expo-image';
 import { LinearGradient } from 'expo-linear-gradient';
 import { router } from 'expo-router';
 import { useState } from 'react';
@@ -6,6 +5,8 @@ import { Pressable, ScrollView, Text, View } from 'react-native';
 import Animated, { FadeIn, LinearTransition } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
+import { DetailsButton } from '@/components/details-button';
+import { DriveInCar } from '@/components/drive-in-car';
 import { CloseButton } from '@/components/icon-buttons';
 import { CARS, type Car } from '@/data/cars';
 
@@ -17,16 +18,22 @@ function DecadeRow({
   car,
   index,
   expanded,
-  onPress,
+  settled,
+  onExpand,
+  onSettled,
+  onDetails,
 }: {
   car: Car;
   index: number;
   expanded: boolean;
-  onPress: () => void;
+  settled: boolean;
+  onExpand: () => void;
+  onSettled: () => void;
+  onDetails: () => void;
 }) {
   return (
     <Animated.View layout={LinearTransition.duration(260)} style={{ opacity: rowOpacity(index) }}>
-      <Pressable onPress={onPress} className="active:opacity-70">
+      <Pressable onPress={onExpand} className="active:opacity-70">
         <View className="flex-row">
           {/* Meta column */}
           <View className="w-[124px] pt-2 pr-3">
@@ -51,18 +58,25 @@ function DecadeRow({
             ) : null}
           </View>
         </View>
-
-        {expanded ? (
-          <Animated.View entering={FadeIn.duration(320)} className="mt-3">
-            <Image
-              source={car.hero}
-              contentFit="contain"
-              transition={200}
-              style={{ width: '100%', height: 168 }}
-            />
-          </Animated.View>
-        ) : null}
       </Pressable>
+
+      {expanded ? (
+        <View className="mt-3" style={{ height: 176 }}>
+          <DriveInCar
+            key={car.id}
+            source={car.hero}
+            delay={120}
+            onSettled={onSettled}
+            containerStyle={{ flex: 1 }}
+            imageStyle={{ width: '100%', height: '100%' }}
+          />
+          {settled ? (
+            <Animated.View entering={FadeIn.duration(260)} className="absolute right-1 top-0">
+              <DetailsButton onPress={onDetails} />
+            </Animated.View>
+          ) : null}
+        </View>
+      ) : null}
     </Animated.View>
   );
 }
@@ -70,13 +84,17 @@ function DecadeRow({
 export default function Collection() {
   const insets = useSafeAreaInsets();
   const [expandedId, setExpandedId] = useState<string>('1970s');
+  const [settledId, setSettledId] = useState<string | null>(null);
 
-  const handlePress = (car: Car) => {
+  const handleExpand = (car: Car) => {
     if (car.id !== expandedId) {
+      setSettledId(null);
       setExpandedId(car.id);
-    } else {
-      router.push({ pathname: '/car/[id]', params: { id: car.id } });
     }
+  };
+
+  const openDetails = (car: Car) => {
+    router.push({ pathname: '/car/[id]', params: { id: car.id } });
   };
 
   return (
@@ -104,7 +122,10 @@ export default function Collection() {
               car={car}
               index={index}
               expanded={car.id === expandedId}
-              onPress={() => handlePress(car)}
+              settled={car.id === expandedId && settledId === car.id}
+              onExpand={() => handleExpand(car)}
+              onSettled={() => setSettledId(car.id)}
+              onDetails={() => openDetails(car)}
             />
           </View>
         ))}
