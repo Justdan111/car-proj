@@ -1,4 +1,4 @@
-import { router } from 'expo-router';
+import { router, type Href } from 'expo-router';
 import { useEffect, useState } from 'react';
 import { Text, View } from 'react-native';
 import Svg, { Circle, Line } from 'react-native-svg';
@@ -31,7 +31,7 @@ export default function Loading() {
       if (t < 1) {
         raf = requestAnimationFrame(tick);
       } else {
-        setTimeout(() => router.replace('/onboarding'), 420);
+        setTimeout(() => router.replace('/onboarding' as Href), 420);
       }
     };
 

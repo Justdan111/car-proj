@@ -1,10 +1,10 @@
-import { Image } from 'expo-image';
 import { router, useLocalSearchParams } from 'expo-router';
 import { Pressable, ScrollView, Text, View } from 'react-native';
-import Animated, { FadeIn, FadeInDown } from 'react-native-reanimated';
+import Animated, { FadeIn } from 'react-native-reanimated';
 import Svg, { Polyline } from 'react-native-svg';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
+import { DriveInCar } from '@/components/drive-in-car';
 import { DotGridButton } from '@/components/icon-buttons';
 import { CARS, getCar } from '@/data/cars';
 
@@ -88,10 +88,15 @@ export default function CarDetails() {
           </Animated.Text>
         </View>
 
-        {/* Hero image */}
-        <Animated.View entering={FadeInDown.duration(600)} className="mt-2 px-4">
-          <Image source={car.hero} contentFit="contain" style={{ width: '100%', height: 200 }} />
-        </Animated.View>
+        {/* Hero image drives in from the left */}
+        <View className="mt-2 px-4" style={{ height: 200 }}>
+          <DriveInCar
+            source={car.hero}
+            delay={200}
+            containerStyle={{ flex: 1 }}
+            imageStyle={{ width: '100%', height: '100%' }}
+          />
+        </View>
 
         {/* Metadata grid */}
         <View className="mt-10 flex-row px-6">
@@ -132,10 +137,13 @@ export default function CarDetails() {
         </View>
 
         {/* Secondary image + model code */}
-        <View className="mt-10">
-          <Animated.View entering={FadeInDown.duration(600)} className="px-4">
-            <Image source={car.detail} contentFit="contain" style={{ width: '100%', height: 190 }} />
-          </Animated.View>
+        <View className="mt-10" style={{ height: 190 }}>
+          <DriveInCar
+            source={car.detail}
+            delay={450}
+            containerStyle={{ flex: 1, paddingHorizontal: 16 }}
+            imageStyle={{ width: '100%', height: '100%' }}
+          />
           <Text
             className="absolute bottom-1 left-6 font-technoSemi text-graphite"
             style={{ fontSize: 29 }}>

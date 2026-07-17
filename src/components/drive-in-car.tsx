@@ -1,6 +1,6 @@
 import { Image, type ImageContentFit } from 'expo-image';
 import { useEffect } from 'react';
-import type { ImageSourcePropType, StyleProp, ViewStyle } from 'react-native';
+import type { ImageStyle, ImageSourcePropType, StyleProp, ViewStyle } from 'react-native';
 import { useWindowDimensions } from 'react-native';
 import Animated, {
   Easing,
@@ -14,7 +14,7 @@ import Animated, {
 
 type Props = {
   source: ImageSourcePropType;
-  imageStyle: StyleProp<ViewStyle>;
+  imageStyle: StyleProp<ImageStyle>;
   containerStyle?: StyleProp<ViewStyle>;
   contentFit?: ImageContentFit;
   delay?: number;

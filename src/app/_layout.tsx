@@ -43,19 +43,18 @@ export default function RootLayout() {
   return (
     <>
       <StatusBar style="light" />
-      <Stack screenOptions={{ headerShown: false }}>
-        <Stack.Screen name="index" options={{ contentStyle: { backgroundColor: '#0B0E14' } }} />
+      <Stack
+        screenOptions={{
+          headerShown: false,
+          animation: 'slide_from_right',
+        }}>
         <Stack.Screen
-          name="collection"
-          options={{
-            presentation: 'modal',
-            contentStyle: { backgroundColor: '#F1F0EC' },
-          }}
+          name="index"
+          options={{ animation: 'fade', contentStyle: { backgroundColor: '#0B0E14' } }}
         />
-        <Stack.Screen
-          name="car/[id]"
-          options={{ contentStyle: { backgroundColor: '#F1F0EC' } }}
-        />
+        <Stack.Screen name="onboarding" options={{ contentStyle: { backgroundColor: '#0B0E14' } }} />
+        <Stack.Screen name="collection" options={{ contentStyle: { backgroundColor: '#F1F0EC' } }} />
+        <Stack.Screen name="car/[id]" options={{ contentStyle: { backgroundColor: '#F1F0EC' } }} />
       </Stack>
     </>
   );
