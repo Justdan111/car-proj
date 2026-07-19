@@ -32,7 +32,7 @@ export function DetailsButton({ onPress }: { onPress: () => void }) {
               backgroundColor: active ? PULSE : 'transparent',
             }}>
             <Text
-              className="mr-3 font-technoSemi text-[15px]"
+              className="mr-3 font-technoSemi text-[15px] hover:bg-[#2547F4]"
               style={{ letterSpacing: 2, color: active ? '#FFFFFF' : PULSE }}>
               DETAILS
             </Text>
